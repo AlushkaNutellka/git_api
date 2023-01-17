@@ -135,7 +135,7 @@ class ForgotPaswordSerializer(serializers.Serializer):
         email = self.validated_data.get('email')
         user = User.objects.get(email=email)
         user.create_activation_code()
-        send_mail('Восстановление пароля', f'ваш код восстановления: {user.activation_code}', 'amanbekovnurgazy2002@gmail.com', [email])
+        send_mail('Восстановление пароля', f'ваш код восстановления: {user.activation_code}', 'jiulwinchester@gmail.com', [email])
 
 
 
@@ -157,7 +157,6 @@ class ForgotPasswordCompleteSerializer(serializers.Serializer):
         if password1 != password2:
             raise serializers.ValidationError('Пароли не совпадают')
         return attrs
-
 
     def set_new_password(self):
         email = self.validated_data.get('email')

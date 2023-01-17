@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from rest_framework import generics
-
-from .permissions import IsAdminAuthPermission
-from .models import Post, Category, Tag
-from .serializers import CategorySerializer, TagSerializer, PostSerializer, PostListSerializer
+from drf_yasg.utils import swagger_auto_schema
+from .permissions import IsAdminAuthPermission, IsAuthorPermission
+from .models import Post, Category, Tag, Comment
+from .serializers import CategorySerializer, TagSerializer, PostSerializer, PostListSerializer,CommentSerializer
 import django_filters
 from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
@@ -13,7 +13,6 @@ from rest_framework.permissions import AllowAny
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
 
 
 class TagListView(generics.ListAPIView):
@@ -42,13 +41,10 @@ class PostViewSet(ModelViewSet):
     search_fields = ['tags__slug', 'created_at']
     ordering_fields = ['created_at', 'title']
 
-
     def get_serializer_class(self):
         if self.action == 'list':
             return PostListSerializer
         return self.serializer_class
-
-
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -57,18 +53,25 @@ class PostViewSet(ModelViewSet):
         elif self.action == 'create':
             self.permission_classes = [IsAdminAuthPermission]
 
-        elif self.action == ['update', 'partial_update', 'destroy']:
-            self.permission_classes = ['только автор']
-        
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsAuthorPermission]
 
-
-        # to_representation like, commenty
-        # добавить 
+        return super().get_permissions()
 
 
 
+class CommentView(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [AllowAny]
 
+        elif self.action == 'create':
+            self.permission_classes = [IsAdminAuthPermission]
 
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsAuthorPermission]
 
-
+        return super().get_permissions()

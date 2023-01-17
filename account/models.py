@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.crypto import get_random_string
 
+
 class UserManager(BaseUserManager):
     def _create(self, email, password, **extra_fields):
         if not email:
@@ -25,7 +26,6 @@ class UserManager(BaseUserManager):
         return self._create(email, password, **extra_fields)
 
 
-
 class User(AbstractBaseUser):
     email = models.EmailField(primary_key=True)
     name = models.CharField(max_length=15)
@@ -38,7 +38,6 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
 
-
     activation_code = models.CharField(max_length=20, blank=True)
 
     def __str__(self) -> str:
@@ -46,7 +45,6 @@ class User(AbstractBaseUser):
     
     def has_module_perms(self, app_label):
         return self.is_staff
-    
 
     def has_perm(self, perm, obj=None):
         return self.is_staff
